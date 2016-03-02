@@ -1,0 +1,110 @@
+market_pulse:
+  -
+    date: 1/2/2015
+    pulse: U
+  -
+    date: 1/6/2015
+    pulse: C
+  -
+    date: 1/9/2015
+    pulse: U
+  -
+    date: 1/15/2015
+    pulse: P
+  -
+    date: 1/23/2015
+    pulse: U
+  -
+    date: 1/29/2015
+    pulse: P
+  -
+    date: 2/11/2015
+    pulse: U
+  -
+    date: 3/9/2015
+    pulse: P
+  -
+    date: 3/23/2015
+    pulse: U
+  -
+    date: 3/27/2015
+    pulse: P
+  -
+    date: 4/24/2015
+    pulse: U
+  -
+    date: 5/1/2015
+    pulse: P
+  -
+    date: 5/7/2015
+    pulse: C
+  -
+    date: 5/15/2015
+    pulse: U
+  -
+    date: 6/29/2015
+    pulse: P
+  -
+    date: 7/17/2015
+    pulse: U
+  -
+    date: 7/27/2015
+    pulse: P
+  -
+    date: 8/24/2015
+    pulse: C
+  -
+    date: 9/9/2015
+    pulse: U
+  -
+    date: 9/10/2015
+    pulse: P
+  -
+    date: 9/28/2015
+    pulse: C
+  -
+    date: 10/5/2015
+    pulse: U
+  -
+    date: 11/16/2015
+    pulse: P
+  -
+    date: 11/19/2015
+    pulse: U
+  -
+    date: 12/4/2015
+    pulse: P
+  -
+    date: 12/14/2015
+    pulse: C
+  -
+    date: 12/17/2015
+    pulse: U
+  -
+    date: 12/21/2015
+    pulse: P
+  -
+    date: 12/30/2015
+    pulse: U
+  -
+    date: 1/5/2016
+    pulse: C
+  -
+    date: 1/27/2016
+    pulse: U
+  -
+    date: 1/28/2016
+    pulse: P
+  -
+    date: 2/1/2016
+    pulse: U
+  -
+    date: 2/8/2016
+    pulse: P
+  -
+    date: 2/9/2016
+    pulse: C
+  -
+    date: 2/18/2016
+    pulse: U
+  

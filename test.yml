@@ -1,45 +1,70 @@
-configuration:
-  stop_loss: 0.07
-  profit_target: 0.2
-  decline_from_peak: 0.1
 positions:
   -
     symbol: ADPT
+    breakout_date: 2/19/2015
     buy_point: 38.88
-    breakout_date: "2/19/2015"
   -
     symbol: HZNP
+    breakout_date: 5/27/2015
     buy_point: 32.25
-    breakout_date: "5/27/2015"
   -
     symbol: SKX
+    breakout_date: 2/12/2015
     buy_point: 20.88
-    breakout_date: "2/12/2015"
   -
     symbol: ABMD
+    breakout_date: 7/30/2015
     buy_point: 76.70
-    breakout_date: "7/30/2015"
   -
     symbol: TREE
+    breakout_date: 2/26/2015
     buy_point: 50.88
-    breakout_date: "2/26/2015"
   -
     symbol: TREE
+    breakout_date: 6/18/2015
     buy_point: 66.08
-    breakout_date: "6/18/2015"
   -
     symbol: NFLX
+    breakout_date: 4/16/2015
     buy_point: 69.62
-    breakout_date: "4/16/2015"
+    splits:
+      -
+        top: 7
+        bottom: 1
+        date: 7/15/2015
   -
     symbol: DY
-    buy_point: 80.95
     breakout_date: 11/3/2015
+    buy_point: 80.95
   -
     symbol: CBM
-    buy_point: 24.55
     breakout_date: 2/6/2015
+    buy_point: 24.55
   -
     symbol: CBM
-    buy_point: 41.80
     breakout_date: 6/3/2015
+    buy_point: 41.80
+  -
+    symbol: AMBA
+    breakout_date: 3/4/2015
+    buy_point: 63.30
+  -
+    symbol: STMP
+    breakout_date: 3/4/2015
+    buy_point: 51.17
+  -
+    symbol: STMP
+    breakout_date: 5/8/2015
+    buy_point: 70.24
+  -
+    symbol: STMP
+    breakout_date: 6/24/2015
+    buy_point: 75.30
+  -
+    symbol: STMP
+    breakout_date: 11/6/2015
+    buy_point: 88.97
+  -
+    symbol: STMP
+    breakout_date: 12/15/2015
+    buy_point: 106.53

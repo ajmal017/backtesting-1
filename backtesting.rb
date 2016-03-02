@@ -1,18 +1,19 @@
 require_relative 'position'
+require_relative 'configuration'
 require_relative 'yahoo_client'
 require 'yaml'
 require 'active_support/all'
 
-FILE = './test.yml'
+POSITIONS_FILE = './test.yml'
 OUTPUT_DIR = './output'
 
 FileUtils.rm_rf(OUTPUT_DIR)
 FileUtils.mkdir(OUTPUT_DIR)
 
-raw = YAML.load(File.read(FILE)).with_indifferent_access
-raw[:positions] ||= []
+configuration = Configuration.values
 
-configuration = raw[:configuration]
+raw = YAML.load(File.read(POSITIONS_FILE)).with_indifferent_access
+raw[:positions] ||= []
 
 positions = raw[:positions].map do |row|
   position = Position.new(configuration: configuration, data: row)
@@ -21,8 +22,7 @@ positions = raw[:positions].map do |row|
   position
 end
 
-summary_header = "Symbol,Entry Date,Exit Date,Total Weeks,Close,SMA(20),Close Above BP (%),G/L (%),Biggest G/L (%),Stop Loss,Peak Decline (%)"
-summary_strings = [ summary_header ]
+summary_strings = [ Position.summary_report_header ]
 
 positions.each do |row|
 

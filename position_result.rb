@@ -1,5 +1,6 @@
 require 'bigdecimal'
 require_relative 'quote'
+require_relative 'market_pulse'
 
 class PositionResult
 
@@ -108,11 +109,25 @@ class PositionResult
   end
 
   def summary_report_string
-    "#{formatted_date},#{week_number},#{quote.close.round(2)},#{sma20.round(2)},#{close_above_buy_point_percent.round(4)},#{gain_loss_percent.round(4)},#{high_above_buy_price_percent.round(4)},#{stop_loss.round(2)},#{current_decline_from_peak.round(4)}"
+    string = "#{formatted_date},#{week_number},#{quote.close.round(2)},#{sma20.round(2)},#{gain_loss_percent.round(4)},#{high_above_buy_price_percent.round(4)},#{stop_loss.round(2)},#{current_decline_from_peak.round(4)}"
+
+    configuration = Configuration.values
+    if configuration[:use_market_pulse] || false
+      string << ",#{MarketPulse.market_pulse_for_date(quote.date)}"
+    end
+
+    string
   end
 
   def report_string
-    "#{week_number},#{formatted_date},#{quote.open.round(2)},#{quote.high.round(2)},#{quote.low.round(2)},#{quote.close.round(2)},#{buy_price.round(2)},#{highest_high.round(2)},#{sma20.round(2)},#{close_above_buy_point_percent.round(4)},#{gain_loss_percent.round(4)},#{high_above_buy_price_percent.round(4)},#{stop_loss.round(2)},#{current_decline_from_peak.round(4)}"
+    string = "#{week_number},#{formatted_date},#{quote.open.round(2)},#{quote.high.round(2)},#{quote.low.round(2)},#{quote.close.round(2)},#{buy_price.round(2)},#{highest_high.round(2)},#{sma20.round(2)},#{close_above_buy_point_percent.round(4)},#{gain_loss_percent.round(4)},#{high_above_buy_price_percent.round(4)},#{stop_loss.round(2)},#{current_decline_from_peak.round(4)}"
+
+    configuration = Configuration.values
+    if configuration[:use_market_pulse] || false
+      string << ",#{MarketPulse.market_pulse_for_date(quote.date)}"
+    end
+
+    string
   end
 
 end
