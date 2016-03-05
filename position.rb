@@ -11,7 +11,7 @@ class Position
 
   attr_accessor :symbol
   attr_accessor :buy_point, :buy_price
-  attr_accessor :breakout_date
+  attr_accessor :breakout_date, :buy_date
   attr_accessor :profit_target_percent, :stop_loss_percent, :decline_from_peak_percent
   attr_accessor :quotes
   attr_accessor :stock_splits
@@ -24,8 +24,9 @@ class Position
 
     @symbol = data[:symbol]
     @buy_point = data[:buy_point].to_d
-    @buy_price = @buy_point
+    @buy_price = (data[:buy_price] || 0).to_d
     @breakout_date = Date.strptime(data[:breakout_date], '%m/%d/%Y')
+    @buy_date = Date.strptime(data[:buy_date] || data[:breakout_date], '%m/%d/%Y')
     @profit_target_percent = configuration[:profit_target].to_d
     @stop_loss_percent = configuration[:stop_loss].to_d
     @decline_from_peak_percent = configuration[:decline_from_peak].to_d
@@ -80,21 +81,23 @@ class Position
       if q.date == breakout_date
         breakout_index = index
 
-        if q.open > buy_zone
-          last = q.high - ((q.high - q.low) / 2.to_d)
+        if @buy_price == 0.to_d
+          if q.open > buy_zone
+            last = q.high - ((q.high - q.low) / 2.to_d)
 
-          if q.open > last
-            top = last
-            bottom = q.open
+            if q.open > last
+              top = last
+              bottom = q.open
+            else
+              top = q.open
+              bottom = last
+            end
+
+            @buy_price = Random.new.rand(top.to_f..bottom.to_f).to_d
           else
-            top = q.open
-            bottom = last
+            start = q.open > buy_point ? q.open : buy_point
+            @buy_price = Random.new.rand(start.to_f..q.high.to_f).to_d
           end
-
-          @buy_price = Random.new.rand(top.to_f..bottom.to_f).to_d
-        else
-          start = q.open > buy_point ? q.open : buy_point
-          @buy_price = Random.new.rand(start.to_f..q.high.to_f).to_d
         end
 
         break
@@ -132,12 +135,12 @@ class Position
   def report_string
     header = self.class.report_header
     strings = [ header ]
-    strings << results.map(&:report_string).flatten
+    strings << results.select{ |r| r.quote.date >= @buy_date }.map(&:report_string).flatten
     strings.join("\n")
   end
 
   def self.report_header
-    header = "Week Num,Date,Open,High,Low,Close,Buy Price,Highest High,SMA(20),Close Above BP (%),G/L (%),Biggest G/L (%),Stop Loss,Peak Decline (%)"
+    header = "Week Num,Date,Buy Price,Open,High,Low,Close,SMA(20),Close Above BP (%),G/L (%),Biggest G/L (%),Stop Loss,Stop Loss Type,Peak Decline (%)"
 
     configuration = Configuration.values
     if configuration[:use_market_pulse] || false
@@ -148,7 +151,7 @@ class Position
   end
 
   def self.summary_report_header
-    header = "Symbol,Entry Date,Exit Date,Total Weeks,Close,SMA(20),G/L (%),Biggest G/L (%),Stop Loss,Peak Decline (%)"
+    header = "Symbol,Entry Date,Exit Date,Total Weeks,Buy Price,Close,SMA(20),G/L (%),Biggest G/L (%),Stop Loss,Stop Loss Type,Peak Decline (%)"
 
     configuration = Configuration.values
     if configuration[:use_market_pulse] || false

@@ -3,7 +3,17 @@ require 'active_support/all'
 
 MARKET_PULSE_FILE = './settings/market_pulse.yml'
 
+MARKET_PULSE = {
+  uptrend: "Confirmed Uptrend",
+  pressure: "Uptrend Under Pressure",
+  correction: "Market In Correction"
+}
+
 class MarketPulse
+
+  def self.market_pulse_for_date_string(date=nil)
+    MARKET_PULSE[MarketPulse.market_pulse_for_date(date)]
+  end
 
   def self.market_pulse_for_date(date=nil)
     values = MarketPulse.values
@@ -13,7 +23,7 @@ class MarketPulse
 
       prev = index - 1
       if pulse_date > date && prev >= 0
-        return MarketPulse.formatted_pulse_for_code(values[prev][:pulse])
+        return MarketPulse.pulse_for_code(values[prev][:pulse])
       end
     end
   end
@@ -22,14 +32,14 @@ class MarketPulse
     YAML.load(File.read(MARKET_PULSE_FILE)).with_indifferent_access[:market_pulse]
   end
 
-  def self.formatted_pulse_for_code(code=nil)
+  def self.pulse_for_code(code=nil)
     case code
     when 'U'
-      return 'Confirmed Uptrend'
+      return :uptrend
     when 'P'
-      return 'Uptrend Under Pressure'
+      return :pressure
     when 'C'
-      return 'Market In Correction'
+      return :correction
     else
       return nil
     end
