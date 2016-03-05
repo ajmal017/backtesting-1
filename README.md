@@ -50,7 +50,7 @@ The script will exit a position based on the following rules.
 2. **Buy Point Stop Loss:** The **Stop Loss** is moved up to the **Buy Point** when the Highest High above the **Buy Point** is greater than or equal to the Breakeven Threshold.
 3. **Breakeven Stop Loss:** The **Stop Loss** is moved up to **Breakeven** when the Highest High above the **Buy Price** is greater than or equal to the Breakeven Threshold.
 4. **Decline From the Peak Rule:** Exit when the **CLOSE** for the day meets the **Decline From Peak** percentage and is below the 20-day simple moving average or **SMA(20)**. *By using the close below the SMA(20) I give the stock some room to make its move.*
-5. **Market In Correction:** Exit when the **Market Pulse** changes to **Market in Correction** and the position is sitting at a loss.
+5. **Market In Correction:** Exit when **IBD's Market Pulse** changes to **Market in Correction** and the position is sitting at a loss.
 
 *Note: The Breakeven Threshold is the Profit Target Divided by 2. Example: If my Profit Target is 20%, I move my Stop Loss to Breakeven when the Highest High since the day of the Breakout is greater than or equal to 10% above my Buy Price*
 
