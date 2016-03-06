@@ -18,14 +18,20 @@ class MarketPulse
   def self.market_pulse_for_date(date=nil)
     values = MarketPulse.values
 
+    pulse = nil
     values.each_with_index do |v, index|
       pulse_date = Date.strptime(v[:date], '%m/%d/%Y')
 
       prev = index - 1
       if pulse_date > date && prev >= 0
-        return MarketPulse.pulse_for_code(values[prev][:pulse])
+        pulse = MarketPulse.pulse_for_code(values[prev][:pulse])
+        break
       end
     end
+
+    pulse = MarketPulse.pulse_for_code(values.last[:pulse]) if pulse.blank?
+
+    pulse
   end
 
   def self.values

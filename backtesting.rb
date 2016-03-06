@@ -33,6 +33,8 @@ positions = raw[:positions].map do |row|
   position = Position.new(configuration: configuration, data: row)
   position.calculate_results
 
+  puts "symbol: #{position.symbol}, Entry Date: #{position.formatted_buy_date} Exit Date: #{position.results.last.formatted_date}, G/L (%): #{(position.results.last.gain_loss_percent * 100).round(2)}"
+
   position
 end
 

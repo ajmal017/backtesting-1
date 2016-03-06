@@ -95,8 +95,9 @@ class Position
 
             @buy_price = Random.new.rand(top.to_f..bottom.to_f).to_d
           else
-            start = q.open > buy_point ? q.open : buy_point
-            @buy_price = Random.new.rand(start.to_f..q.high.to_f).to_d
+            entry = q.open > buy_point ? q.open : buy_point
+            limits = [entry, q.high].minmax
+            @buy_price = Random.new.rand(limits[0].to_f..limits[1].to_f).to_d
           end
         end
 
@@ -118,6 +119,10 @@ class Position
 
   def formatted_breakout_date
     return breakout_date.strftime('%m/%d/%Y')
+  end
+
+  def formatted_buy_date
+    return buy_date.strftime('%m/%d/%Y')
   end
 
   def file_date_string
