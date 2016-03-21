@@ -8,7 +8,7 @@ class PositionResult
   attr_accessor :buy_point, :buy_price
   attr_accessor :breakout_date, :buy_date
   attr_accessor :profit_target_percent, :stop_loss_percent, :decline_from_peak_percent
-  attr_accessor :highest_high, :sma20
+  attr_accessor :highest_high, :lowest_low, :sma20
   attr_accessor :quote
 
   def initialize(options={})
@@ -23,6 +23,7 @@ class PositionResult
     @decline_from_peak_percent = position.decline_from_peak_percent
     @quote = options[:quote]
     @highest_high = 0.to_d
+    @lowest_low = 0.to_d
     @sma20 = 0.to_d
   end
 
@@ -48,6 +49,12 @@ class PositionResult
     return buy_price if buy_price == 0.to_d
 
     (quote.close - buy_price) / buy_price
+  end
+
+  def lowest_low_below_buy_price
+    return buy_price if buy_price == 0.to_d
+
+    (lowest_low - buy_price) / buy_price
   end
 
   def breakeven_threshold
@@ -120,6 +127,8 @@ class PositionResult
   end
 
   def stop_loss_type
+    return :decline_from_peak if meets_decline_from_peak?
+    return :market_correction if meets_market_correction?
     return :breakeven if breakeven_stop?
     return :buy_point if buy_point_stop?
 
@@ -128,21 +137,12 @@ class PositionResult
 
   def stop_loss_string
     {
+      decline_from_peak: "Peak Decline",
+      market_correction: "Market Correction",
       breakeven: "Breakeven",
       buy_point: "Buy Point",
       max_stop_loss: "Maximum"
     }[stop_loss_type]
-  end
-
-  def summary_report_string
-    string = "#{formatted_date},#{week_number},#{buy_price.round(2)},#{quote.close.round(2)},#{sma20.round(2)},#{(gain_loss_percent * 100).round(2)},#{(high_above_buy_price_percent * 100).round(2)},#{stop_loss.round(2)},#{stop_loss_string},#{(current_decline_from_peak * 100).round(2)}"
-
-    configuration = Configuration.values
-    if configuration[:use_market_pulse] || false
-      string << ",#{market_pulse_string}"
-    end
-
-    string
   end
 
   def report_string

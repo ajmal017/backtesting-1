@@ -16,15 +16,17 @@ class Position
   attr_accessor :quotes
   attr_accessor :stock_splits
   attr_accessor :results
+  attr_accessor :ignore_exit
 
   def initialize(options={})
     configuration = options[:configuration]
     data = options[:data]
     splits = data[:splits] || []
+    @ignore_exit = configuration[:ignore_exit]
 
     @symbol = data[:symbol]
     @buy_point = data[:buy_point].to_d
-    @buy_price = (data[:buy_price] || 0).to_d
+    @buy_price = @ignore_exit ? @buy_point : (data[:buy_price] || 0).to_d
     @breakout_date = Date.strptime(data[:breakout_date], '%m/%d/%Y')
     @buy_date = Date.strptime(data[:buy_date] || data[:breakout_date], '%m/%d/%Y')
     @profit_target_percent = configuration[:profit_target].to_d
@@ -47,19 +49,24 @@ class Position
     quotes.each_with_index do |q, index|
       next if index < 19
 
+      range_start = 19
       start = index - 19
 
-      highs = quotes[start..index].map { |row| row.high.round(2).to_f }
+      highs = quotes[range_start..index].map { |row| row.high.round(2).to_f }
+      lows = quotes[range_start..index].map { |row| row.low.round(2).to_f }
+
       highest_high = highs.max
+      lowest_low = lows.min
       sma20 = quotes[start..index].map { |row| row.close }.sum / 20
 
       result = PositionResult.new(position: self, quote: q)
       result.highest_high = highest_high
+      result.lowest_low = lowest_low
       result.sma20 = sma20
 
       @results << result
 
-      break if result.exit?
+      break if !ignore_exit && result.exit?
     end
   end
 
@@ -82,22 +89,10 @@ class Position
         breakout_index = index
 
         if @buy_price == 0.to_d
-          if q.open > buy_zone
-            last = q.high - ((q.high - q.low) / 2.to_d)
-
-            if q.open > last
-              top = last
-              bottom = q.open
-            else
-              top = q.open
-              bottom = last
-            end
-
-            @buy_price = Random.new.rand(top.to_f..bottom.to_f).to_d
+          if q.open > buy_zone || q.open > buy_point
+            @buy_price = q.open
           else
-            entry = q.open > buy_point ? q.open : buy_point
-            limits = [entry, q.high].minmax
-            @buy_price = Random.new.rand(limits[0].to_f..limits[1].to_f).to_d
+            @buy_price = @buy_point
           end
         end
 
@@ -125,6 +120,16 @@ class Position
     return buy_date.strftime('%m/%d/%Y')
   end
 
+  def biggest_loss_percent
+    lowest_low = results.last.lowest_low_below_buy_price
+    first_low = results.first.lowest_low_below_buy_price
+
+    return results.first.gain_loss_percent if results.count == 1
+    return results.first.gain_loss_percent if first_low <= lowest_low
+
+    lowest_low
+  end
+
   def file_date_string
     @breakout_date.strftime('%m-%d-%Y')
   end
@@ -134,7 +139,28 @@ class Position
   end
 
   def summary_report_string
-    "#{symbol},#{formatted_breakout_date},#{results.last.summary_report_string}"
+    configuration = Configuration.values
+    use_market_pulse = configuration[:use_market_pulse] || false
+    last = results.last
+
+    summary = []
+    summary << symbol
+    summary << formatted_breakout_date
+    summary << MarketPulse.market_pulse_for_date_string(breakout_date) if use_market_pulse
+    summary << last.formatted_date
+    summary << MarketPulse.market_pulse_for_date_string(last.quote.date) if use_market_pulse
+    summary << "#{last.week_number}"
+    summary << "#{last.buy_price.round(2)}"
+    summary << "#{last.quote.close.round(2)}"
+    summary << "#{last.sma20.round(2)}"
+    summary << "#{(last.gain_loss_percent * 100).round(2)}"
+    summary << "#{(last.high_above_buy_price_percent * 100).round(2)}"
+    summary << "#{(biggest_loss_percent * 100).round(2)}"
+    summary << "#{last.stop_loss.round(2)}"
+    summary << last.stop_loss_string
+    summary << "#{(last.current_decline_from_peak * 100).round(2)}"
+
+    summary.join(",")
   end
 
   def report_string
@@ -156,14 +182,27 @@ class Position
   end
 
   def self.summary_report_header
-    header = "Symbol,Entry Date,Exit Date,Total Weeks,Buy Price,Close,SMA(20),G/L (%),Biggest G/L (%),Stop Loss,Stop Loss Type,Peak Decline (%)"
-
     configuration = Configuration.values
-    if configuration[:use_market_pulse] || false
-      header << ',Market Pulse'
-    end
+    use_market_pulse = configuration[:use_market_pulse] || false
 
-    header
+    header = []
+    header << "Symbol"
+    header << "Entry Date"
+    header << "Entry Date Market Pulse" if use_market_pulse
+    header << "Exit Date"
+    header << "Exit Date Market Pulse" if use_market_pulse
+    header << "Total Weeks"
+    header << "Entry Price"
+    header << "Exit Price"
+    header << "SMA(20)"
+    header << "G/L (%)"
+    header << "Max Gain (%)"
+    header << "Max Loss (%)"
+    header << "Stop Loss"
+    header << "Stop Loss Type"
+    header << "Peak Decline (%)"
+
+    header.join(",")
   end
 
 end

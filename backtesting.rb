@@ -11,6 +11,7 @@ OptionParser.new do |opts|
 
   opts.on('-f', '--filename FILENAME', 'Filename') { |v| options[:filename] = v }
   opts.on('-o', '--output_dir OUTPUT_DIR', 'Output directory') { |v| options[:output_dir] = v }
+  opts.on('-i', '--ignore-exit') { |v| options[:ignore_exit] = v }
 end.parse!
 
 unless options[:filename]
@@ -20,11 +21,13 @@ end
 
 POSITIONS_FILE = options[:filename]
 OUTPUT_DIR = options[:output_dir] || './output'
+IGNORE_EXIT = options[:ignore_exit] || false
 
 FileUtils.rm_rf(OUTPUT_DIR)
 FileUtils.mkdir(OUTPUT_DIR)
 
 configuration = Configuration.values
+configuration[:ignore_exit] = IGNORE_EXIT
 
 raw = YAML.load(File.read(POSITIONS_FILE)).with_indifferent_access
 raw[:positions] ||= []
